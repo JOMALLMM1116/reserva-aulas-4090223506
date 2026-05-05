@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Reserva de Aulas | UMG</title>
+    <meta name="description" content="Sistema de Reserva de Aulas - Práctica de Análisis y Diseño UML - Universidad Mariano Gálvez de Guatemala">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           Variables CSS - Tema claro (default)
+           ============================================================ */
+        :root {
+            --bg-primary: #fafaf7;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1efe8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-tertiary: #888780;
+            --accent-blue: #185fa5;
+            --accent-blue-light: #e6f1fb;
+            --accent-teal: #0f6e56;
+            --accent-teal-light: #e1f5ee;
+            --accent-amber: #ba7517;
+            --accent-amber-light: #faeeda;
+            --border-color: #e0ddd2;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Tema oscuro */
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #242422;
+            --bg-tertiary: #2c2c2a;
+            --text-primary: #f0eee6;
+            --text-secondary: #c2c0b6;
+            --text-tertiary: #888780;
+            --accent-blue: #5da3e8;
+            --accent-blue-light: #1a3045;
+            --accent-teal: #5dcaa5;
+            --accent-teal-light: #15302a;
+            --accent-amber: #f0a945;
+            --accent-amber-light: #3d2a10;
+            --border-color: #3a3a37;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ============================================================
+           Reset y base
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ============================================================
+           Layout
+           ============================================================ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ============================================================
+           Header
+           ============================================================ */
+        header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        .logo span {
+            color: var(--accent-blue);
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-1px);
+        }
+
+        /* ============================================================
+           Hero / Portada
+           ============================================================ */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--accent-blue-light);
+            color: var(--accent-blue);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(36px, 6vw, 64px);
+            line-height: 1.1;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .hero h1 em {
+            color: var(--accent-blue);
+            font-style: italic;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 32px;
+        }
+
+        .author-card {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 20px 32px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .author-card .name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .author-card .info {
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        .author-card .course {
+            color: var(--accent-teal);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ============================================================
+           Sections
+           ============================================================ */
+        section {
+            padding: 60px 0;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 24px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        /* ============================================================
+           Cards / Funcionalidades
+           ============================================================ */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-card.alumno {
+            border-top: 3px solid var(--accent-blue);
+        }
+
+        .feature-card.admin {
+            border-top: 3px solid var(--accent-teal);
+        }
+
+        .feature-card .role {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card.alumno .role {
+            background: var(--accent-blue-light);
+            color: var(--accent-blue);
+        }
+
+        .feature-card.admin .role {
+            background: var(--accent-teal-light);
+            color: var(--accent-teal);
+        }
+
+        .feature-card ul {
+            list-style: none;
+            margin-top: 16px;
+        }
+
+        .feature-card li {
+            padding: 10px 0 10px 28px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            font-size: 15px;
+        }
+
+        .feature-card li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            font-weight: 700;
+        }
+
+        .feature-card.alumno li::before {
+            color: var(--accent-blue);
+        }
+
+        .feature-card.admin li::before {
+            color: var(--accent-teal);
+        }
+
+        /* ============================================================
+           Diagramas
+           ============================================================ */
+        #diagramas {
+            background: var(--bg-tertiary);
+        }
+
+        .diagram-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow);
+        }
+
+        .diagram-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .diagram-block .number {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            text-align: center;
+            background: var(--accent-amber-light);
+            color: var(--accent-amber);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 16px;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .diagram-block h3 {
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 0;
+        }
+
+        .diagram-block .description {
+            margin-top: 16px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .diagram-image {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .diagram-image img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+        }
+
+        /* ============================================================
+           Footer
+           ============================================================ */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        footer .repo-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+        }
+
+        footer .repo-link:hover {
+            opacity: 0.7;
+            text-decoration: underline;
+        }
+
+        /* ============================================================
+           Responsive
+           ============================================================ */
+        @media (max-width: 640px) {
+            .hero {
+                padding: 60px 0 40px;
+            }
+
+            section {
+                padding: 40px 0;
+            }
+
+            .feature-card,
+            .diagram-block {
+                padding: 24px;
+            }
+
+            .author-card {
+                padding: 16px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Reserva de <span>Aulas</span></div>
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-text">Modo oscuro</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         HERO
+         ============================================================ -->
+    <section class="hero">
+        <div class="container">
+            <span class="hero-tag">Práctica de Análisis y Diseño UML</span>
+            <h1>Sistema de <em>Reserva de Aulas</em></h1>
+            <p>Una solución sencilla para que los estudiantes universitarios puedan reservar aulas para proyectos, reuniones o tutorías de forma organizada y eficiente.</p>
+            <div class="author-card">
+                <span class="name">Jose Manuel Maquin Leal</span>
+                <span class="info">Carné 4090223506</span>
+                <span class="course">Análisis y Diseño UML — Práctica</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         ¿QUÉ ES?
+         ============================================================ -->
+    <section id="que-es">
+        <div class="container">
+            <span class="section-tag">Acerca del proyecto</span>
+            <h2>¿Qué es este sistema?</h2>
+            <p>El Sistema de Reserva de Aulas es una propuesta diseñada para resolver una necesidad real dentro de la universidad: que los estudiantes puedan reservar aulas disponibles cuando las necesiten para sus proyectos, reuniones de grupo o tutorías académicas, sin tener que recurrir a procesos manuales.</p>
+            <p>Como parte de esta práctica, se modeló el sistema utilizando notación UML estándar, abarcando las fases de análisis (casos de uso y actividades) y diseño (modelo entidad-relación), siguiendo las buenas prácticas de la ingeniería de software.</p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         FUNCIONALIDADES
+         ============================================================ -->
+    <section id="funcionalidades">
+        <div class="container">
+            <span class="section-tag">Funcionalidades</span>
+            <h2>¿Qué se puede hacer en el sistema?</h2>
+            <p>El sistema está diseñado para dos tipos de usuarios con responsabilidades bien definidas:</p>
+
+            <div class="features-grid">
+                <div class="feature-card alumno">
+                    <span class="role">Alumno</span>
+                    <h3>Para los estudiantes</h3>
+                    <ul>
+                        <li>Registrarse en el sistema con su correo institucional</li>
+                        <li>Iniciar sesión de forma segura</li>
+                        <li>Consultar la disponibilidad de aulas en tiempo real</li>
+                        <li>Reservar un aula para un horario específico</li>
+                        <li>Consultar el estado de sus reservas activas</li>
+                        <li>Cancelar una reserva si ya no la necesita</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card admin">
+                    <span class="role">Administrador</span>
+                    <h3>Para los administradores</h3>
+                    <ul>
+                        <li>Iniciar sesión en el panel administrativo</li>
+                        <li>Consultar todas las reservas activas del sistema</li>
+                        <li>Aprobar las solicitudes de reserva pendientes</li>
+                        <li>Rechazar reservas que no cumplan los criterios</li>
+                        <li>Llevar control del uso de las aulas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         DIAGRAMAS UML
+         ============================================================ -->
+    <section id="diagramas">
+        <div class="container">
+            <span class="section-tag">Modelado UML</span>
+            <h2>Diagramas del sistema</h2>
+            <p>A continuación se presentan los tres diagramas que documentan el análisis y diseño del sistema:</p>
+
+            <!-- Diagrama 1: Casos de Uso -->
+            <div class="diagram-block">
+                <span class="number">1</span>
+                <h3>Diagrama de Casos de Uso</h3>
+                <p class="description">Muestra las interacciones entre los actores principales del sistema (Alumno, Administrador y el Sistema de Correo Institucional como actor secundario) y las acciones que cada uno puede realizar. Incluye relaciones <em>«include»</em> y <em>«extend»</em> para representar dependencias entre casos de uso.</p>
+                <div class="diagram-image">
+                    <img src="img/DiagramasExa-DiagramaCasosUso2.jpg" alt="Diagrama de Casos de Uso del Sistema de Reserva de Aulas">
+                </div>
+            </div>
+
+            <!-- Diagrama 2: Actividades -->
+            <div class="diagram-block">
+                <span class="number">2</span>
+                <h3>Diagrama de Actividades</h3>
+                <p class="description">Representa el flujo completo del proceso de reserva utilizando carriles (swimlanes) para diferenciar las responsabilidades del Alumno, el Sistema y el Administrador. Incluye puntos de decisión, manejo de errores con reintento y el flujo opcional de cancelación de reserva.</p>
+                <div class="diagram-image">
+                    <img src="img/DiagramasExa-DiagramaActividades.jpg" alt="Diagrama de Actividades del Sistema de Reserva de Aulas">
+                </div>
+            </div>
+
+            <!-- Diagrama 3: Entidad-Relación -->
+            <div class="diagram-block">
+                <span class="number">3</span>
+                <h3>Diagrama Entidad-Relación</h3>
+                <p class="description">Modela las cuatro entidades principales del sistema (Alumno, Aula, Reserva y Administrador) usando notación Crow's Foot. Define los atributos, claves primarias, claves foráneas y las cardinalidades que relacionan cada entidad para representar correctamente la estructura de la base de datos.</p>
+                <div class="diagram-image">
+                    <img src="img/DiagramasExa-Entidad%20relacion.jpg" alt="Diagrama Entidad-Relación del Sistema de Reserva de Aulas">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer>
+        <div class="container">
+            <p><strong>Jose Manuel Maquin Leal</strong> — Carné 4090223506</p>
+            <p>Universidad Mariano Gálvez de Guatemala — Centro Universitario de Cobán</p>
+            <p>Ingeniería en Sistemas de Información y Ciencias de la Computación</p>
+            <p style="margin-top: 16px;">
+                <a href="https://github.com/JOMALLMM1116/reserva-aulas-4090223506" class="repo-link" target="_blank" rel="noopener">Ver código en GitHub →</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- ============================================================
+         JS - Theme Toggle
+         ============================================================ -->
+    <script>
+        // Detectar preferencia guardada o usar la del sistema
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+        document.documentElement.setAttribute('data-theme', initialTheme);
+        updateThemeUI(initialTheme);
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI(newTheme);
+        }
+
+        function updateThemeUI(theme) {
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            if (theme === 'dark') {
+                icon.textContent = '☀️';
+                text.textContent = 'Modo claro';
+            } else {
+                icon.textContent = '🌙';
+                text.textContent = 'Modo oscuro';
+            }
+        }
+    </script>
+
+</body>
+</html>
